@@ -371,6 +371,24 @@ kbd{display:inline-block;padding:1px 6px;border-radius:5px;background:rgba(255,2
 .stage-main{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,2.2vh,26px);
   padding:clamp(10px,2vh,26px) 20px;min-height:0;position:relative}
 
+/* Foco: participante que está bajo el puntero */
+.spotlight{
+  display:flex;align-items:center;gap:12px;height:clamp(38px,5.4vh,54px);
+  padding:0 22px;border-radius:99px;border:1px solid rgba(245,194,75,.28);
+  background:linear-gradient(180deg,rgba(245,194,75,.13),rgba(245,194,75,.04));
+  box-shadow:0 14px 34px -20px rgba(245,194,75,.6);max-width:94%;
+  transition:border-color .2s,background .2s;
+}
+.spotlight.is-live{border-color:rgba(245,194,75,.6);background:linear-gradient(180deg,rgba(245,194,75,.2),rgba(245,194,75,.06))}
+.spot-num{
+  font-size:clamp(12px,1.5vh,15px);font-weight:800;color:#14100a;padding:2px 10px;border-radius:99px;
+  background:linear-gradient(140deg,var(--gold-2),var(--gold));font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.spot-name{
+  font-family:var(--font-display);font-size:clamp(15px,2.5vh,24px);font-weight:700;letter-spacing:-.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw;color:var(--text);
+}
+
 .wheel-wrap{
   position:relative;display:grid;place-items:center;
   width:min(58vh,min(100%,660px));aspect-ratio:1/1;

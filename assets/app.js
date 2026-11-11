@@ -360,6 +360,7 @@ function drawWheel() {
     wctx.fillStyle = 'rgba(255,255,255,.22)';
     wctx.fillText('Carga la lista para girar', 0, 16);
     wctx.restore();
+    setSpot('—', 'Sin participantes');
     return;
   }
 
@@ -387,29 +388,42 @@ function drawWheel() {
   }
 
   // textos
-  const p = list[0];
   const stepDeg = step * 180 / Math.PI;
   const showName = stepDeg >= 10;
   for (let i = 0; i < n; i++) {
     const item = list[i];
     const mid = i * step + step / 2;
     const isGold = i % 2 === 0;
-    wctx.save();
-    wctx.rotate(mid);
-    const baseFont = Math.max(9, Math.min(size * 0.035, step * radius * 0.52));
-    const label = showName ? item.name : (String(item.num).length > 4 ? String(item.num).slice(0, 4) : String(item.num));
-    wctx.font = `700 ${baseFont}px Inter, system-ui, sans-serif`;
-    wctx.textAlign = 'right';
-    wctx.textBaseline = 'middle';
-    wctx.fillStyle = isGold ? 'rgba(12,16,26,.92)' : 'rgba(246,247,251,.94)';
-    const maxW = radius * 0.62;
-    let text = label;
-    if (wctx.measureText(text).width > maxW) {
-      while (text.length > 2 && wctx.measureText(text + '…').width > maxW) text = text.slice(0, -1);
-      text += '…';
+    if (showName) {
+      wctx.save();
+      wctx.rotate(mid);
+      const baseFont = Math.max(9, Math.min(size * 0.035, step * radius * 0.52));
+      wctx.font = `700 ${baseFont}px Inter, system-ui, sans-serif`;
+      wctx.textAlign = 'right';
+      wctx.textBaseline = 'middle';
+      wctx.fillStyle = isGold ? 'rgba(12,16,26,.92)' : 'rgba(246,247,251,.94)';
+      const maxW = radius * 0.62;
+      let text = item.name;
+      if (wctx.measureText(text).width > maxW) {
+        while (text.length > 2 && wctx.measureText(text + '…').width > maxW) text = text.slice(0, -1);
+        text += '…';
+      }
+      wctx.fillText(text, radius * 0.92, 0);
+      wctx.restore();
+    } else {
+      // muchos participantes: números legibles (rectos, tipo esfera de reloj)
+      wctx.save();
+      wctx.rotate(mid);
+      wctx.translate(radius * 0.80, 0);
+      wctx.rotate(-(rotation + mid));
+      const baseFont = Math.max(8, Math.min(size * 0.028, step * radius * 0.5));
+      wctx.font = `800 ${baseFont}px Inter, system-ui, sans-serif`;
+      wctx.textAlign = 'center';
+      wctx.textBaseline = 'middle';
+      wctx.fillStyle = isGold ? 'rgba(12,16,26,.95)' : 'rgba(246,247,251,.96)';
+      wctx.fillText(String(item.num).slice(0, 4), 0, 0);
+      wctx.restore();
     }
-    wctx.fillText(text, radius * 0.92, 0);
-    wctx.restore();
   }
 
   // separador interior + puntos
@@ -433,6 +447,30 @@ function drawWheel() {
   gl.addColorStop(.55, 'rgba(255,255,255,0)');
   wctx.beginPath(); wctx.arc(0, 0, radius, 0, Math.PI * 2); wctx.fillStyle = gl; wctx.fill();
   wctx.restore();
+
+  updateSpotlight(list, n, step);
+}
+
+/* Participante bajo el puntero (arriba = -π/2) */
+let spotKey = '';
+function updateSpotlight(list, n, step) {
+  const TWO_PI = Math.PI * 2;
+  let a = (-Math.PI / 2 - rotation) % TWO_PI;
+  if (a < 0) a += TWO_PI;
+  const idx = Math.floor(a / step) % n;
+  const cur = list[Math.max(0, Math.min(n - 1, idx))];
+  if (!cur) return;
+  const key = cur.num + '|' + cur.name;
+  if (key !== spotKey) { spotKey = key; setSpot('N° ' + cur.num, cur.name); }
+}
+function setSpot(num, name) {
+  const n = $('#spotNum'), s = $('#spotName');
+  if (n) n.textContent = num;
+  if (s) s.textContent = name;
+}
+function setSpotLive(on) {
+  const el = $('#spotlight');
+  if (el) el.classList.toggle('is-live', !!on);
 }
 
 /* ══════════════ AUDIO ══════════════ */
@@ -757,6 +795,7 @@ function spin() {
   spinning = true;
   refreshSpinButton();
   $('#wheelWrap').classList.add('is-spinning');
+  setSpotLive(true);
   Audio_.resume();
   Audio_.drumRoll(duration / 1000);
 
@@ -786,6 +825,8 @@ function finish(winners) {
   spinning = false;
   rotation = ((rotation % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
   $('#wheelWrap').classList.remove('is-spinning');
+  setSpotLive(false);
+  setSpot('★', winners.map(w => w.name).join(' · '));
   refreshSpinButton();
 
   if (state.sounds) Audio_.celebrate();
