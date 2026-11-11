@@ -33,7 +33,8 @@ const DEFAULT = {
   partners: [],
   participants: [],
   history: [],
-  round: 1
+  round: 1,
+  seedVersion: null
 };
 let state = structuredClone(DEFAULT);
 let rotation = 0;
@@ -51,6 +52,35 @@ function load() {
   if (!Array.isArray(state.participants)) state.participants = [];
   if (!Array.isArray(state.partners)) state.partners = [];
   if (!Array.isArray(state.history)) state.history = [];
+}
+
+/* ══════════════ SEMILLA DEL EVENTO (assets/participantes.json) ══════════════
+   Se aplica sola la primera vez (o cuando la versión de la lista cambia),
+   así cualquiera que abra la URL en el evento ya ve la lista cargada.      */
+async function applySeed() {
+  try {
+    const res = await fetch('assets/participantes.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    const seed = await res.json();
+    if (!seed || !Array.isArray(seed.participants) || !seed.participants.length) return;
+    if (state.seedVersion === seed.version) return;
+
+    state.participants = seed.participants.map(p => ({
+      num: String(p.num ?? ''),
+      name: String(p.name ?? '').trim(),
+      detail: String(p.detail ?? '').trim(),
+      won: false
+    })).filter(p => p.name);
+    state.seedVersion = seed.version;
+    state.history = [];
+    state.round = 1;
+    if (seed.event) state.event = seed.event;
+    if (seed.brand) state.brand = seed.brand;
+    if (seed.prize) state.prize = seed.prize;
+    save();
+    hydrateInputs(); renderBrand(); renderParticipants(); renderSummaries(); drawWheel();
+    setTimeout(() => toast(`${state.participants.length} participantes · ${state.event || 'evento'} listos`), 500);
+  } catch (e) { /* sin semilla: la app sigue funcionando normal */ }
 }
 
 /* ══════════════ PARTICIPANTES ══════════════ */
@@ -1243,8 +1273,9 @@ function hydrateInputs() {
   $('#inpDuration').style.setProperty('--fill', ((state.duration - 3) / 13 * 100) + '%');
 }
 
-function init() {
+async function init() {
   load();
+  await applySeed();
   hydrateInputs();
   bind();
   renderBrand();

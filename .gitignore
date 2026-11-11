@@ -10,3 +10,8 @@ qa*.mjs
 qa-*.png
 *.png
 sorteo-qa*
+
+qa3.mjs
+qa2.mjs
+qa.mjs
+live-*.png
