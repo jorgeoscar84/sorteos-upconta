@@ -5,3 +5,8 @@ Thumbs.db
 .vercel
 .env
 .env.*
+
+qa*.mjs
+qa-*.png
+*.png
+sorteo-qa*

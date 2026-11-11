@@ -220,6 +220,9 @@ img{max-width:100%;display:block}
 }
 .slot-clear{position:absolute;top:7px;right:7px;width:22px;height:22px;border-radius:50%;
   background:rgba(0,0,0,.55);color:#fff;font-size:14px;display:grid;place-items:center;z-index:2}
+/* [hidden] debe ganarle a display:grid/flex de los componentes */
+.slot-clear[hidden],.logo-slot img[hidden],.logo-slot-empty[hidden],
+.paste-wrap[hidden],.winner-overlay[hidden],.partner-thumb[hidden]{display:none!important}
 
 /* ── Campos ── */
 .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
