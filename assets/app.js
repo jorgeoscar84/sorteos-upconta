@@ -83,6 +83,24 @@ async function applySeed() {
   } catch (e) { /* sin semilla: la app sigue funcionando normal */ }
 }
 
+/* ══════════════ LECTOR DE EXCEL (carga perezosa) ══════════════
+   952 KB solo se descargan si el usuario sube/descarga un Excel:
+   la app abre instantánea en el evento.                              */
+let xlsxPromise = null;
+function ensureXLSX() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  if (!xlsxPromise) {
+    xlsxPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'assets/xlsx.full.min.js';
+      s.onload = () => window.XLSX ? resolve(window.XLSX) : reject(new Error('No se pudo inicializar el lector de Excel'));
+      s.onerror = () => reject(new Error('No se pudo cargar el lector de Excel'));
+      document.head.appendChild(s);
+    });
+  }
+  return xlsxPromise;
+}
+
 /* ══════════════ PARTICIPANTES ══════════════ */
 const participants = () => state.participants;
 const eligible = () => state.participants.filter(p => !p.won);
@@ -172,7 +190,8 @@ function rowsToParticipants(rows) {
 async function readDataFile(file) {
   const ext = (file.name.split('.').pop() || '').toLowerCase();
   if (ext === 'xlsx' || ext === 'xls') {
-    if (!window.XLSX) throw new Error('Lector de Excel no disponible. Guarda el archivo como CSV.');
+    try { await ensureXLSX(); }
+    catch (e) { throw new Error('No se pudo cargar el lector de Excel. Guarda el archivo como CSV.'); }
     const buf = await file.arrayBuffer();
     const wb = XLSX.read(buf, { type: 'array' });
     const ws = wb.Sheets[wb.SheetNames[0]];
@@ -988,7 +1007,8 @@ function templateRows() {
   ];
 }
 
-function downloadTemplateXlsx() {
+async function downloadTemplateXlsx() {
+  try { await ensureXLSX(); } catch (e) { downloadTemplateCsv(); return; }
   if (window.XLSX) {
     const ws = XLSX.utils.aoa_to_sheet(templateRows());
     ws['!cols'] = [{ wch: 10 }, { wch: 30 }, { wch: 28 }, { wch: 24 }, { wch: 16 }];
