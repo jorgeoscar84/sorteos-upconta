@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#070A14" />
+<title>UpConta · Sorteos en Vivo</title>
+<meta name="description" content="Sorteos en vivo para eventos corporativos: ruleta, tambores, confeti y serpentinas." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/styles.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23F5C24B'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23070A14'/%3E%3C/svg%3E" />
+</head>
+<body>
+
+<!-- ══════════ FONDO ══════════ -->
+<div class="bg-layer" aria-hidden="true">
+  <div class="bg-glow bg-glow--a"></div>
+  <div class="bg-glow bg-glow--b"></div>
+  <div class="bg-glow bg-glow--c"></div>
+  <div class="bg-grid"></div>
+</div>
+
+<canvas id="fx" class="fx-canvas" aria-hidden="true"></canvas>
+
+<!-- ══════════ APP ══════════ -->
+<div class="app" id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logos" id="brandLogos">
+        <div class="brand-mark" id="brandMark">U</div>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name" id="brandName">UpConta</span>
+        <span class="brand-sub">Sorteos en vivo</span>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <div class="partner-strip" id="partnerStrip" aria-label="Marcas participantes"></div>
+      <button class="icon-btn" id="btnSound" title="Activar/desactivar sonido" aria-pressed="true">
+        <span class="ico" data-ico="sound"></span><span class="lbl">Sonido</span>
+      </button>
+      <button class="icon-btn" id="btnFullscreen" title="Pantalla completa (F)">
+        <span class="ico" data-ico="expand"></span><span class="lbl">Pantalla</span>
+      </button>
+      <button class="icon-btn icon-btn--accent" id="btnSetup" title="Configuración">
+        <span class="ico" data-ico="gear"></span><span class="lbl">Configurar</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ══════════ VISTA: CONFIGURACIÓN ══════════ -->
+  <main class="view view--setup is-active" id="viewSetup">
+    <div class="setup-grid">
+
+      <!-- COLUMNA IZQUIERDA -->
+      <div class="setup-main">
+
+        <!-- 1 · MARCA -->
+        <section class="card">
+          <div class="card-head">
+            <h2><span class="step">1</span> Marcas y logos</h2>
+            <p class="card-hint">Tu logo principal y los logos de las marcas que participan en el evento.</p>
+          </div>
+          <div class="logo-grid">
+            <div class="logo-slot logo-slot--main" id="slotMainLogo" tabindex="0" role="button" aria-label="Subir logo principal">
+              <img id="imgMainLogo" alt="" hidden />
+              <div class="logo-slot-empty">
+                <span class="plus">+</span>
+                <span>Logo principal</span>
+                <small>PNG / SVG / JPG</small>
+              </div>
+              <button class="slot-clear" data-clear="main" title="Quitar logo" hidden>×</button>
+            </div>
+            <div class="logo-slot logo-slot--multi" id="slotPartners" tabindex="0" role="button" aria-label="Subir logos de marcas participantes">
+              <div class="logo-slot-empty">
+                <span class="plus">+</span>
+                <span>Marcas participantes</span>
+                <small>Varias a la vez</small>
+              </div>
+            </div>
+          </div>
+          <div class="field-grid">
+            <label class="field">
+              <span>Nombre de la marca principal</span>
+              <input type="text" id="inpBrand" value="UpConta" placeholder="UpConta" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span>Título del evento (opcional)</span>
+              <input type="text" id="inpEvent" placeholder="Evento de contadores · Quito" autocomplete="off" />
+            </label>
+          </div>
+        </section>
+
+        <!-- 2 · PARTICIPANTES -->
+        <section class="card">
+          <div class="card-head">
+            <h2><span class="step">2</span> Participantes
+              <span class="chip" id="chipCount">0</span>
+            </h2>
+            <p class="card-hint">Sube tu base en Excel o CSV en una sola fila: número, nombre y datos extra.</p>
+          </div>
+
+          <div class="import-grid">
+            <div class="dropzone" id="dropzone" tabindex="0" role="button">
+              <span class="dz-ico" data-ico="upload"></span>
+              <strong>Arrastra tu Excel aquí</strong>
+              <small>.xlsx · .xls · .csv — o haz clic para buscar</small>
+            </div>
+            <div class="import-side">
+              <button class="btn btn--ghost" id="btnTemplateXlsx"><span class="ico" data-ico="excel"></span> Plantilla Excel</button>
+              <button class="btn btn--ghost" id="btnTemplateCsv"><span class="ico" data-ico="csv"></span> Plantilla CSV</button>
+              <button class="btn btn--ghost" id="btnPaste"><span class="ico" data-ico="paste"></span> Pegar lista</button>
+              <button class="btn btn--ghost" id="btnDemo"><span class="ico" data-ico="spark"></span> Datos demo</button>
+            </div>
+          </div>
+
+          <div class="paste-wrap" id="pasteWrap" hidden>
+            <textarea id="inpPaste" rows="5" placeholder="1, Ana Torres&#10;2, Luis Mora&#10;3, Carla Vega"></textarea>
+            <div class="paste-actions">
+              <button class="btn btn--primary btn--sm" id="btnPasteApply">Cargar lista</button>
+              <button class="btn btn--ghost btn--sm" id="btnPasteCancel">Cancelar</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="ptable" id="ptable">
+              <thead>
+                <tr><th>N°</th><th>Participante</th><th>Detalle</th><th aria-label="Acciones"></th></tr>
+              </thead>
+              <tbody id="ptableBody"></tbody>
+            </table>
+            <div class="table-empty" id="tableEmpty">
+              <span class="ico" data-ico="users"></span>
+              <p>Aún no hay participantes.<br />Empieza con los datos demo o sube tu archivo.</p>
+            </div>
+          </div>
+          <div class="table-foot">
+            <button class="btn btn--danger-ghost btn--sm" id="btnClearParticipants">Limpiar lista</button>
+            <span class="muted" id="tableFootInfo">—</span>
+          </div>
+        </section>
+
+        <!-- 3 · AJUSTES -->
+        <section class="card">
+          <div class="card-head">
+            <h2><span class="step">3</span> Ajustes del sorteo</h2>
+            <p class="card-hint">Todo lo puedes cambiar en pleno evento, sin recargar.</p>
+          </div>
+
+          <div class="field-grid">
+            <label class="field">
+              <span>Premio</span>
+              <input type="text" id="inpPrize" value="Premio principal" placeholder="ej. Laptop, bono, canasta" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span>Ganadores en este sorteo</span>
+              <div class="stepper" data-stepper="winners">
+                <button type="button" data-dir="-1" aria-label="Menos">−</button>
+                <input type="number" id="inpWinners" min="1" max="12" value="1" />
+                <button type="button" data-dir="1" aria-label="Más">+</button>
+              </div>
+            </label>
+          </div>
+
+          <div class="range-grid">
+            <label class="range-field">
+              <span>Vueltas de la ruleta <b id="lblTurns">8</b></span>
+              <input type="range" id="inpTurns" min="2" max="40" step="1" value="8" />
+            </label>
+            <label class="range-field">
+              <span>Duración del giro <b id="lblDuration">8</b> s</span>
+              <input type="range" id="inpDuration" min="3" max="16" step="1" value="8" />
+            </label>
+          </div>
+
+          <div class="toggle-grid">
+            <label class="toggle">
+              <input type="checkbox" id="chkRemoveWinners" checked />
+              <span class="toggle-track"><span class="toggle-dot"></span></span>
+              <span class="toggle-text">Descartar ganadores <small>(no vuelven a salir)</small></span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="chkSounds" checked />
+              <span class="toggle-track"><span class="toggle-dot"></span></span>
+              <span class="toggle-text">Tambores + fanfarria <small>(sonido sintetizado)</small></span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="chkConfetti" checked />
+              <span class="toggle-track"><span class="toggle-dot"></span></span>
+              <span class="toggle-text">Confeti y serpentinas</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="chkSimultaneous" checked />
+              <span class="toggle-track"><span class="toggle-dot"></span></span>
+              <span class="toggle-text">Revelar ganadores a la vez <small>(si son varios)</small></span>
+            </label>
+          </div>
+        </section>
+      </div>
+
+      <!-- COLUMNA DERECHA: RESUMEN -->
+      <aside class="setup-side">
+        <div class="card card--sticky summary">
+          <div class="summary-head">
+            <span class="eyebrow">Listo para el evento</span>
+            <h3 id="sumPrize">Premio principal</h3>
+          </div>
+          <ul class="summary-list">
+            <li><span>Participantes</span><b id="sumParticipants">0</b></li>
+            <li><span>Ganadores por sorteo</span><b id="sumWinners">1</b></li>
+            <li><span>Vueltas</span><b id="sumTurns">8</b></li>
+            <li><span>Duración</span><b id="sumDuration">8 s</b></li>
+            <li><span>Marcas</span><b id="sumBrands">1</b></li>
+          </ul>
+          <button class="btn btn--hero" id="btnOpenStage">
+            <span class="ico" data-ico="play"></span> Abrir escenario
+          </button>
+          <p class="summary-tip">En el escenario: <kbd>Espacio</kbd> gira · <kbd>F</kbd> pantalla completa · <kbd>R</kbd> reinicia</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ══════════ VISTA: ESCENARIO ══════════ -->
+  <main class="view view--stage" id="viewStage">
+    <div class="stage-grid">
+
+      <aside class="stage-rail">
+        <div class="rail-block">
+          <span class="eyebrow">Premio</span>
+          <h2 class="rail-prize" id="stagePrize">Premio principal</h2>
+          <span class="rail-event" id="stageEvent"></span>
+        </div>
+        <div class="rail-block rail-stats">
+          <div><b id="stageCount">0</b><span>en juego</span></div>
+          <div><b id="stageWinners">1</b><span>ganador/es</span></div>
+          <div><b id="stageRound">1</b><span>sorteo</span></div>
+        </div>
+        <div class="rail-block">
+          <span class="eyebrow">Historial</span>
+          <ul class="history" id="historyList"></ul>
+        </div>
+        <div class="rail-actions">
+          <button class="btn btn--ghost btn--sm" id="btnBackSetup">Configurar</button>
+          <button class="btn btn--ghost btn--sm" id="btnExportResults">Exportar</button>
+          <button class="btn btn--danger-ghost btn--sm" id="btnResetAll">Reiniciar</button>
+        </div>
+      </aside>
+
+      <section class="stage-main">
+        <div class="wheel-wrap" id="wheelWrap">
+          <div class="wheel-pointer" id="wheelPointer">
+            <svg viewBox="0 0 32 34" aria-hidden="true"><path d="M16 34 L1 6 a15 15 0 1 1 30 0 Z" /></svg>
+          </div>
+          <div class="wheel-ring">
+            <canvas id="wheel"></canvas>
+            <div class="wheel-hub">
+              <span class="hub-turns" id="hubTurns">8</span>
+              <span class="hub-label">vueltas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stage-bar">
+          <button class="btn btn--hero btn--big" id="btnSpin">
+            <span class="ico" data-ico="play"></span> <span id="spinLabel">Girar</span>
+          </button>
+          <p class="stage-hint" id="stageHint">Presiona <kbd>Espacio</kbd> o el botón para girar</p>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- ══════════ OVERLAY GANADORES ══════════ -->
+<div class="winner-overlay" id="winnerOverlay" aria-live="polite" hidden>
+  <div class="winner-stage">
+    <span class="winner-kicker" id="winnerKicker">¡Ganador!</span>
+    <div class="winner-cards" id="winnerCards"></div>
+    <div class="winner-actions">
+      <button class="btn btn--primary" id="btnWinnerNext">Siguiente sorteo</button>
+      <button class="btn btn--ghost" id="btnWinnerClose">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+<!-- input file ocultos -->
+<input type="file" id="fileLogoMain" accept="image/*" hidden />
+<input type="file" id="filePartners" accept="image/*" multiple hidden />
+<input type="file" id="fileData" accept=".xlsx,.xls,.csv,.txt,.tsv" hidden />
+
+<script src="assets/xlsx.full.min.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
