@@ -235,7 +235,28 @@ export async function createApp() {
   app.get('/', pageStudio);
   app.get('/admin', pageAdmin);
 
-  app.use(express.static(PUBLIC_DIR, { index: false, maxAge: '1h' }));
+  // Estáticos con caché correcta por tipo:
+  //  - HTML: nunca se cachea (una recarga siempre trae la versión nueva).
+  //  - JS y CSS: `no-cache` = el navegador revalida con ETag en cada carga (304 barato)
+  //    pero SIEMPRE ejecuta el código del último despliegue. Antes `maxAge:'1h'`
+  //    dejaba a los navegadores con JS viejo hasta una hora después de un fix.
+  //  - assets pesados (xlsx, listas): 1 hora, son estáticos de verdad.
+  app.use(express.static(PUBLIC_DIR, {
+    index: false,
+    maxAge: 0,
+    etag: true,
+    lastModified: true,
+    setHeaders(res, filePath) {
+      const ruta = filePath.replace(/\\/g, '/');
+      if (/\.html$/.test(ruta)) {
+        res.setHeader('Cache-Control', 'no-store');
+      } else if (/\/js\/|\/styles\//.test(ruta)) {
+        res.setHeader('Cache-Control', 'no-cache');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+      }
+    }
+  }));
 
   app.use('/api/auth', authRoutes);
   app.use('/api/studio', studioRoutes);
