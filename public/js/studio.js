@@ -12,6 +12,7 @@ import {
   applyBrandColor,
   fileToDataUrl,
   extractDominantColor,
+  fmtDate,
   fmtDateTime,
   confirmDialog,
   licensePill,
@@ -264,6 +265,8 @@ function applyFallbackState() {
   state.participants = [];
   state.draws = [];
   state.license = user.license || null;
+  applyBrandColor(state.branding.brandColor);
+  setBrandTextColor();
 }
 
 /** Aplica el payload de GET /api/studio/state. */
@@ -1499,7 +1502,7 @@ function showLicenseGate(license) {
   if (app) app.setAttribute('aria-hidden', 'true');
   const info = licensePill(license || {});
   const status = license?.status || 'pending';
-  const expiry = license?.expiresAt ? fmtDateTime(`${license.expiresAt}T12:00:00`) : null;
+  const expiry = license?.expiresAt ? fmtDate(license.expiresAt) : null;
 
   let text = 'La cuenta está suspendida o la licencia no está activa. Escríbele a tu asesor para revisar el estado.';
   if (status === 'pending') {

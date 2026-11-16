@@ -99,20 +99,6 @@
   padding: 7px 11px;
 }
 
-.rail-monogram {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  background: var(--brand);
-  color: var(--brand-ink);
-  font-family: var(--font-display);
-  font-weight: 650;
-  font-size: 28px;
-  line-height: 1;
-}
-
 /* Nav vertical */
 .rail__nav {
   display: flex;
@@ -1356,10 +1342,6 @@
     flex: 0 0 auto;
   }
 
-  .rails__user {
-    display: none;
-  }
-
   .rail__user {
     flex: 0 0 auto;
   }
@@ -1389,13 +1371,6 @@
     --logo-h: 30px;
     --logo-w: 120px;
     padding: 4px 7px;
-  }
-
-  .rail-monogram {
-    width: 32px;
-    height: 32px;
-    border-radius: 9px;
-    font-size: 16px;
   }
 
   .brand-plate__id {

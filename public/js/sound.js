@@ -35,7 +35,12 @@ function ensure() {
 }
 
 function ready() {
-  return SoundState.enabled ? ensure() : null;
+  if (!SoundState.enabled) return null;
+  const ctx = ensure();
+  // Sin gesto del usuario el contexto queda suspendido: no se programan
+  // nodos (así el navegador no escupe un warning por cada uno).
+  if (!ctx || ctx.state !== 'running') return null;
+  return ctx;
 }
 
 function noiseSource(ctx) {

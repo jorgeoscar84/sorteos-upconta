@@ -163,11 +163,11 @@ export class Wheel {
 
     /* ── Aro metálico con el color de la marca ── */
     const rimGradient = ctx.createLinearGradient(0, -radius, radius * 0.4, radius);
-    rimGradient.addColorStop(0, mix(colors.brand, '#ffffff', 0.62));
+    rimGradient.addColorStop(0, mix(colors.brand, '#ffffff', 0.46));
     rimGradient.addColorStop(0.28, colors.brand);
-    rimGradient.addColorStop(0.55, mix(colors.brand, '#000000', 0.42));
+    rimGradient.addColorStop(0.55, mix(colors.brand, '#000000', 0.48));
     rimGradient.addColorStop(0.78, colors.brand);
-    rimGradient.addColorStop(1, mix(colors.brand, '#ffffff', 0.4));
+    rimGradient.addColorStop(1, mix(colors.brand, '#ffffff', 0.3));
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, TAU);
     ctx.fillStyle = rimGradient;

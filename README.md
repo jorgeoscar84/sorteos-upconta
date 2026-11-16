@@ -115,3 +115,11 @@ contraseña después del primer acceso.
 - [ ] Múltiples usuarios por cuenta (equipo) y roles internos.
 - [ ] Marca por evento (varios eventos por cuenta con logos distintos).
 - [ ] Certificado público del ganador (link verificable + QR en pantalla).
+
+## Instancia desplegada
+
+- URL: https://sorteo-studio-qpippw-1be1b8-157-180-30-98.sslip.io
+- Proyecto Dokploy: Sorteo Studio (app `sorteo-studio-qpippw`), volumen `sorteo-studio-data` en `/data`.
+- Credenciales: se administran en las variables de entorno de Dokploy (`ADMIN_USERNAME` / `ADMIN_PASSWORD`); no viven en el repositorio.
+- El administrador entra en `/admin`; cada empresa entra en `/` con el usuario que se le entregue.
+
