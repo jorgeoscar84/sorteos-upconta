@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sorteo Studio</title>
+  <meta name="description" content="Estudio de sorteos en vivo: configura la ruleta, la lista y la marca de tu empresa." />
+  <meta name="color-scheme" content="dark" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B101B'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23E3B04B' stroke-width='2'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='%23E3B04B' stroke-width='1.4'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    rel="stylesheet"
+    data-fonts
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..800&display=swap"
+    media="print" />
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..800&display=swap" />
+  </noscript>
+  <link rel="stylesheet" href="/styles/system.css" />
+  <link rel="stylesheet" href="/styles/studio.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Ir al estudio</a>
+
+  <div class="app" id="app">
+    <aside class="rail" aria-label="Marca y navegación del estudio">
+      <div class="rail__brand">
+        <div class="brand-plate brand-plate--rail" id="brandPlate">
+          <div class="brand-plate__logo" id="railLogo"></div>
+          <div class="brand-plate__id">
+            <span class="brand-name" id="railName">Tu empresa</span>
+            <span class="brand-meta" id="railMeta">Estudio de sorteos</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="rail__nav" role="tablist" aria-orientation="vertical" aria-label="Secciones del estudio">
+        <button class="rail-tab" type="button" role="tab" id="tab-sorteo" aria-controls="view-sorteo" aria-selected="true" tabindex="0" data-view="sorteo">
+          <svg class="rail-tab__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 3v18M3 12h18M6.4 6.4l11.2 11.2M17.6 6.4 6.4 17.6" /></svg>
+          <span>Sorteo</span>
+        </button>
+        <button class="rail-tab" type="button" role="tab" id="tab-participantes" aria-controls="view-participantes" aria-selected="false" tabindex="-1" data-view="participantes">
+          <svg class="rail-tab__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 19c0-2.8-1.8-5-4-5s-4 2.2-4 5" /><circle cx="12" cy="8" r="3" /><path d="M20.5 18.5c0-2.2-1.2-4-3-4.6" /><path d="M3.5 18.5c0-2.2 1.2-4 3-4.6" /></svg>
+          <span>Participantes</span>
+        </button>
+        <button class="rail-tab" type="button" role="tab" id="tab-marca" aria-controls="view-marca" aria-selected="false" tabindex="-1" data-view="marca">
+          <svg class="rail-tab__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.6a2.4 2.4 0 0 0 1.6-4.2 2.4 2.4 0 0 1 1.6-4.2H18a3 3 0 0 0 3-3A9 9 0 0 0 12 3Z" /><circle cx="8" cy="9.5" r="1.1" fill="currentColor" stroke="none" /><circle cx="12" cy="7" r="1.1" fill="currentColor" stroke="none" /><circle cx="15.6" cy="9.4" r="1.1" fill="currentColor" stroke="none" /></svg>
+          <span>Marca</span>
+        </button>
+        <button class="rail-tab" type="button" role="tab" id="tab-historial" aria-controls="view-historial" aria-selected="false" tabindex="-1" data-view="historial">
+          <svg class="rail-tab__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" /><path d="M3.5 5v4.5H8" /><path d="M12 8v4.4l2.9 1.7" /></svg>
+          <span>Historial</span>
+        </button>
+      </nav>
+
+      <div class="rail__foot">
+        <div class="rail__lic" id="licensePillWrap"></div>
+        <div class="rail__user">
+          <span class="rail__avatar" id="userAvatar" aria-hidden="true">?</span>
+          <span class="rail__who">
+            <b class="truncate" id="userName">—</b>
+            <small class="truncate" id="userCompany">—</small>
+          </span>
+        </div>
+        <button class="btn btn--ghost btn--sm btn--block" type="button" id="btnLogout">Salir</button>
+        <p class="rail__mark">Sorteo Studio</p>
+      </div>
+    </aside>
+
+    <main class="main" id="main">
+      <header class="appbar">
+        <div class="appbar__lead">
+          <h1 id="viewTitle">Sorteo</h1>
+          <p class="appbar__sub" id="viewSub">Configura la ruleta y ábrela en el escenario.</p>
+        </div>
+        <div class="appbar__actions">
+          <span class="pill pill--muted" id="roundPill">Sorteo 1</span>
+          <span class="save-state" id="saveState" aria-live="polite">Todo guardado</span>
+          <button class="btn btn--icon btn--ghost" type="button" id="btnSoundToggle" aria-pressed="true" aria-label="Silenciar sonido" title="Sonido (M)">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19V5Z" /><path d="M15.5 9.2a4 4 0 0 1 0 5.6" /><path d="M18.3 6.4a8 8 0 0 1 0 11.2" /></svg>
+          </button>
+          <button class="btn btn--primary btn--sm appbar__stage" type="button" id="btnOpenStageTop">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5v14l11-7Z" /></svg>
+            Abrir escenario
+          </button>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="banner" id="loadBanner" hidden></div>
+
+        <!-- ── Vista: Sorteo ─────────────────────────────────────────── -->
+        <section class="view" id="view-sorteo" role="tabpanel" aria-labelledby="tab-sorteo" tabindex="0">
+          <div class="setup-grid">
+            <div class="setup-col">
+              <section class="card">
+                <header class="card__head">
+                  <div>
+                    <h2 class="card__title">El sorteo de hoy</h2>
+                    <p class="card__hint">Los cambios se guardan solos en tu cuenta.</p>
+                  </div>
+                  <span class="pill pill--muted" id="setupRound">Ronda 1</span>
+                </header>
+
+                <div class="setup-fields">
+                  <div class="field">
+                    <label for="inpEvent">Título del evento</label>
+                    <input class="input" id="inpEvent" type="text" maxlength="90" placeholder="Executive Sessions 2026" autocomplete="off" />
+                    <p class="hint">Se muestra grande en el escenario.</p>
+                  </div>
+
+                  <div class="field">
+                    <label for="inpPrize">Premio de esta ronda</label>
+                    <input class="input" id="inpPrize" type="text" maxlength="90" placeholder="Premio principal" autocomplete="off" />
+                  </div>
+
+                  <div class="field-grid">
+                    <div class="field">
+                      <label for="inpWinners">Ganadores por sorteo</label>
+                      <div class="stepper" data-stepper>
+                        <button type="button" data-step="-1" aria-label="Menos ganadores">−</button>
+                        <input id="inpWinners" type="number" inputmode="numeric" min="1" max="12" step="1" value="1" aria-describedby="winnersHint" />
+                        <button type="button" data-step="1" aria-label="Más ganadores">+</button>
+                      </div>
+                      <p class="hint" id="winnersHint">De 1 a 12 por ronda. El servidor elige quién gana.</p>
+                    </div>
+
+                    <div class="field">
+                      <label for="inpDuration">Duración del giro</label>
+                      <div class="range">
+                        <div class="range__head">
+                          <span class="hint">Segundos</span>
+                          <span class="range__val" id="lblDuration">8 s</span>
+                        </div>
+                        <input id="inpDuration" type="range" min="3" max="16" step="1" value="8" aria-describedby="durationHint" />
+                        <p class="hint" id="durationHint">De 3 a 16 segundos de suspenso.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="inpTurns">Vueltas de la ruleta</label>
+                    <div class="range">
+                      <div class="range__head">
+                        <span class="hint">Vueltas completas antes de frenar</span>
+                        <span class="range__val" id="lblTurns">8</span>
+                      </div>
+                      <input id="inpTurns" type="range" min="2" max="40" step="1" value="8" />
+                    </div>
+                  </div>
+
+                  <hr class="divider" />
+
+                  <div class="switches">
+                    <label class="switch">
+                      <input type="checkbox" id="chkRemoveWinners" checked />
+                      <span class="switch__track"><span class="switch__dot"></span></span>
+                      <span class="switch__text">Descartar ganadores<small>Nadie gana dos veces en el mismo evento.</small></span>
+                    </label>
+                    <label class="switch">
+                      <input type="checkbox" id="chkSounds" checked />
+                      <span class="switch__track"><span class="switch__dot"></span></span>
+                      <span class="switch__text">Sonido en el escenario<small>Tambores, fanfarria y aplausos sintetizados.</small></span>
+                    </label>
+                    <label class="switch">
+                      <input type="checkbox" id="chkConfetti" checked />
+                      <span class="switch__track"><span class="switch__dot"></span></span>
+                      <span class="switch__text">Confeti y serpentinas<small>Se apaga solo si el sistema pide menos movimiento.</small></span>
+                    </label>
+                    <label class="switch">
+                      <input type="checkbox" id="chkSimultaneous" checked />
+                      <span class="switch__track"><span class="switch__dot"></span></span>
+                      <span class="switch__text">Revelado simultáneo<small>Desactívalo para revelar los ganadores uno por uno.</small></span>
+                    </label>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div class="setup-col setup-col--preview">
+              <section class="card preview-card">
+                <header class="card__head">
+                  <div>
+                    <h2 class="card__title">Vista previa en vivo</h2>
+                    <p class="card__hint">El mismo canvas del escenario, con tu marca.</p>
+                  </div>
+                  <span class="pill pill--brand num" id="previewCount">0</span>
+                </header>
+
+                <div class="wheel-frame wheel-frame--preview">
+                  <canvas id="wheelPreview" width="520" height="520" role="img" aria-label="Vista previa de la ruleta del sorteo"></canvas>
+                  <div class="hub">
+                    <span class="hub__label">Vueltas</span>
+                    <b class="hub__value" id="previewTurns">8</b>
+                  </div>
+                </div>
+
+                <dl class="summary">
+                  <div>
+                    <dt>Premio</dt>
+                    <dd id="sumPrize">Premio principal</dd>
+                  </div>
+                  <div>
+                    <dt>Elegibles</dt>
+                    <dd class="num" id="sumEligible">0</dd>
+                  </div>
+                  <div>
+                    <dt>Ganadores</dt>
+                    <dd class="num" id="sumWinners">1</dd>
+                  </div>
+                </dl>
+
+                <button class="btn btn--primary btn--lg btn--block" type="button" id="btnOpenStage">
+                  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5v14l11-7Z" /></svg>
+                  Abrir escenario
+                </button>
+                <p class="hint hint--center">Oculta el estudio y proyecta la ruleta. <kbd>F</kbd> pantalla completa.</p>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Vista: Participantes ──────────────────────────────────── -->
+        <section class="view" id="view-participantes" role="tabpanel" aria-labelledby="tab-participantes" tabindex="0" hidden>
+          <div class="part-grid">
+            <section class="card part-import">
+              <header class="card__head">
+                <div>
+                  <h2 class="card__title">La lista del evento</h2>
+                  <p class="card__hint">Excel, CSV o pegar los nombres. Hasta 2.000 personas.</p>
+                </div>
+              </header>
+
+              <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Subir archivo Excel o CSV con la lista de participantes">
+                <svg class="dropzone__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4" /><path d="m7.5 8.5 4.5-4.5 4.5 4.5" /><path d="M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15" /></svg>
+                <strong>Arrastra tu Excel o CSV</strong>
+                <span>Acepta .xlsx, .xls y .csv. La primera columna puede ser el número.</span>
+                <span class="dropzone__cta">Elegir archivo</span>
+              </div>
+              <input type="file" id="fileData" accept=".xlsx,.xls,.csv,.txt,.json" hidden aria-label="Subir archivo Excel o CSV con la lista de participantes" />
+
+              <div class="part-actions">
+                <button class="btn btn--sm" type="button" id="btnTemplateCsv">Plantilla CSV</button>
+                <button class="btn btn--sm" type="button" id="btnEventList">Lista del evento</button>
+                <button class="btn btn--sm" type="button" id="btnPaste" aria-expanded="false" aria-controls="pasteWrap">Pegar lista</button>
+                <button class="btn btn--sm" type="button" id="btnDemo">Datos demo</button>
+                <button class="btn btn--sm btn--danger" type="button" id="btnClearParticipants">Limpiar</button>
+              </div>
+
+              <div class="paste" id="pasteWrap" hidden>
+                <label class="label" for="inpPaste">Una persona por línea</label>
+                <textarea class="textarea" id="inpPaste" rows="6" placeholder="1, Ana Torres, Finanzas&#10;2, Luis Mora, Auditoría"></textarea>
+                <p class="hint">Acepta comas, punto y coma o tabulaciones. Si no hay número, se enumera solo.</p>
+                <div class="row">
+                  <button class="btn btn--primary btn--sm" type="button" id="btnPasteApply">Cargar lista</button>
+                  <button class="btn btn--ghost btn--sm" type="button" id="btnPasteCancel">Cancelar</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="card part-table-card">
+              <header class="card__head">
+                <div>
+                  <h2 class="card__title">Participantes</h2>
+                  <p class="card__hint" id="partCount">Aún sin participantes</p>
+                </div>
+                <span class="pill pill--muted num" id="partPill">0</span>
+              </header>
+
+              <div class="part-table-wrap" id="partTableWrap" hidden>
+                <table class="table" id="partTable">
+                  <thead>
+                    <tr>
+                      <th scope="col">N°</th>
+                      <th scope="col">Nombre</th>
+                      <th scope="col">Detalle</th>
+                      <th scope="col" class="t-actions">Quitar</th>
+                    </tr>
+                  </thead>
+                  <tbody id="partBody"></tbody>
+                </table>
+              </div>
+
+              <div class="empty" id="partEmpty">
+                <strong>Aún sin participantes</strong>
+                <p>Sube la lista del evento o carga los datos demo para ver la ruleta girar.</p>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- ── Vista: Marca ──────────────────────────────────────────── -->
+        <section class="view" id="view-marca" role="tabpanel" aria-labelledby="tab-marca" tabindex="0" hidden>
+          <div class="marca-grid">
+            <section class="card">
+              <header class="card__head">
+                <div>
+                  <h2 class="card__title">Identidad de la empresa</h2>
+                  <p class="card__hint">Es lo primero que se ve en el estudio y en el escenario.</p>
+                </div>
+              </header>
+
+              <div class="logo-slot" id="logoSlot" role="button" tabindex="0" aria-label="Subir logo principal de la empresa">
+                <div class="logo-slot__art" id="logoSlotArt"></div>
+                <div class="logo-slot__text">
+                  <strong id="logoSlotTitle">Sube el logo principal</strong>
+                  <span id="logoSlotHint">PNG, JPG o WebP. Fondo transparente se ve mejor.</span>
+                </div>
+              </div>
+              <input type="file" id="fileLogo" accept="image/png,image/jpeg,image/webp" hidden aria-label="Subir logo principal de la empresa" />
+
+              <div class="row row--end">
+                <button class="btn btn--ghost btn--sm" type="button" id="btnRemoveLogo">Quitar logo</button>
+              </div>
+
+              <div class="field">
+                <label for="inpDisplayName">Nombre a mostrar</label>
+                <input class="input" id="inpDisplayName" type="text" maxlength="80" autocomplete="organization" placeholder="Nombre de la empresa" />
+                <p class="hint">Va debajo del logo y en la entrega del premio.</p>
+              </div>
+
+              <div class="field">
+                <label for="inpBrandColor">Color de acento</label>
+                <div class="color-row">
+                  <input type="color" id="inpBrandColor" class="color-input" aria-describedby="colorHint" />
+                  <code class="color-value" id="brandColorLabel">#E3B04B</code>
+                  <span class="hint" id="colorHint">Se toma del logo; puedes ajustarlo.</span>
+                </div>
+              </div>
+
+              <div class="save-row">
+                <button class="btn btn--primary" type="button" id="btnSaveBrand">Guardar marca</button>
+                <span class="save-state" id="brandSaveState" aria-live="polite"></span>
+              </div>
+            </section>
+
+            <section class="card">
+              <header class="card__head">
+                <div>
+                  <h2 class="card__title">Marcas participantes</h2>
+                  <p class="card__hint">Hasta 12 logos aliados. Se muestran junto al tuyo.</p>
+                </div>
+                <span class="pill pill--muted num" id="partnerCount">0 / 12</span>
+              </header>
+
+              <div class="partner-grid" id="partnerGrid"></div>
+              <input type="file" id="filePartners" accept="image/png,image/jpeg,image/webp" multiple hidden aria-label="Subir logos de marcas participantes" />
+
+              <p class="hint">Cada logo se guarda con su nombre de archivo. Puedes quitarlos antes de guardar.</p>
+            </section>
+          </div>
+        </section>
+
+        <!-- ── Vista: Historial ──────────────────────────────────────── -->
+        <section class="view" id="view-historial" role="tabpanel" aria-labelledby="tab-historial" tabindex="0" hidden>
+          <div class="hist-toolbar">
+            <div>
+              <h2 class="card__title">Acta del evento</h2>
+              <p class="card__hint" id="histHint">Cada ronda queda registrada con su premio y sus ganadores.</p>
+            </div>
+            <div class="hist-actions">
+              <a class="btn btn--sm" id="btnExportCsv" href="/api/studio/results.csv" download="resultados-sorteo.csv">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11" /><path d="m7.5 10.5 4.5 4.5 4.5-4.5" /><path d="M4.5 19.5h15" /></svg>
+                Exportar CSV
+              </a>
+              <button class="btn btn--sm btn--danger" type="button" id="btnResetDraw">Reiniciar sorteo</button>
+            </div>
+          </div>
+
+          <ol class="hist-list" id="histList"></ol>
+
+          <div class="empty" id="histEmpty">
+            <strong>Todavía no hay sorteos</strong>
+            <p>Gira la ruleta en el escenario y aquí queda el acta del evento, ronda por ronda.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── Escenario a pantalla completa ─────────────────────────────── -->
+  <div class="stage" id="stage" role="dialog" aria-modal="true" aria-label="Escenario del sorteo en vivo" hidden>
+    <header class="stage__top">
+      <div class="stage__brand">
+        <div class="stage__logo" id="stageLogo"></div>
+        <div class="stage__id">
+          <p class="stage__company" id="stageCompany">Tu empresa</p>
+          <p class="stage__event" id="stageEvent">Sorteo en vivo</p>
+        </div>
+      </div>
+
+      <div class="stage__meta">
+        <span class="stage__prize" id="stagePrize">Premio principal</span>
+        <span class="pill pill--brand" id="stageRound">Sorteo 1</span>
+      </div>
+
+      <div class="stage__actions">
+        <button class="btn btn--icon btn--ghost" type="button" id="btnStageSound" aria-pressed="true" aria-label="Silenciar sonido" title="Sonido (M)">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19V5Z" /><path d="M15.5 9.2a4 4 0 0 1 0 5.6" /><path d="M18.3 6.4a8 8 0 0 1 0 11.2" /></svg>
+        </button>
+        <button class="btn btn--icon btn--ghost" type="button" id="btnStageFull" aria-label="Pantalla completa" title="Pantalla completa (F)">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9" /><path d="M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9" /><path d="M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15" /><path d="M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15" /></svg>
+        </button>
+        <button class="btn btn--ghost btn--sm" type="button" id="btnStageExit" title="Volver al estudio (Esc)">Salir</button>
+      </div>
+    </header>
+
+    <div class="stage__arena">
+      <div class="stage__spot" id="spotlight">
+        <span class="stage__spot-num" id="spotNum">N° —</span>
+        <span class="stage__spot-name" id="spotName">Carga la lista para empezar</span>
+      </div>
+
+      <div class="wheel-frame wheel-frame--stage" id="wheelWrap">
+        <span class="wheel-pointer" id="wheelPointer" aria-hidden="true"></span>
+        <canvas id="wheelStage" width="640" height="640" role="img" aria-label="Ruleta del sorteo en vivo"></canvas>
+        <div class="hub hub--stage">
+          <span class="hub__label">Vueltas</span>
+          <b class="hub__value" id="hubTurns">8</b>
+        </div>
+      </div>
+
+      <div class="stage__controls">
+        <button class="btn btn--primary btn--lg stage__spin" type="button" id="btnSpin">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5v14l11-7Z" /></svg>
+          <span id="spinLabel">Girar</span>
+        </button>
+        <p class="stage__hint" id="stageHint">
+          <kbd>Espacio</kbd> girar · <kbd>F</kbd> pantalla completa · <kbd>R</kbd> siguiente sorteo · <kbd>M</kbd> sonido
+        </p>
+      </div>
+    </div>
+
+    <div class="winner" id="winnerOverlay" role="dialog" aria-modal="true" aria-labelledby="winnerTitle" hidden>
+      <canvas class="fx-canvas" id="fx" aria-hidden="true"></canvas>
+      <div class="winner__inner">
+        <div class="winner__brand" id="winnerBrand"></div>
+        <p class="winner__kicker" id="winnerTitle">Tenemos ganador</p>
+        <p class="winner__prize" id="winnerPrize">Premio principal</p>
+        <div class="winner__cards" id="winnerCards"></div>
+        <div class="winner__actions">
+          <button class="btn btn--primary btn--lg" type="button" id="btnWinnerNext">Siguiente sorteo <kbd>R</kbd></button>
+          <button class="btn btn--ghost btn--lg" type="button" id="btnWinnerClose">Cerrar <kbd>Esc</kbd></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/studio.js"></script>
+</body>
+</html>

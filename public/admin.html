@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="noindex" />
+  <meta name="description" content="Consola de licencias de Sorteo Studio: alta manual de cuentas, pagos por transferencia y auditoría." />
+  <title>Licencias · Sorteo Studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B101B'/%3E%3Cpath d='M32 12 40 32 32 52 24 32z' fill='%23E3B04B'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..800&display=swap" />
+  <link rel="stylesheet" href="/styles/system.css" />
+  <link rel="stylesheet" href="/styles/admin.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Ir al contenido</a>
+
+  <header class="appbar">
+    <a class="adm-brand" href="/admin" aria-label="Sorteo Studio, consola de licencias">
+      <span class="adm-brand__mark" aria-hidden="true">SS</span>
+      <span class="adm-brand__txt">
+        <span class="adm-brand__name">Sorteo Studio</span>
+        <span class="adm-brand__sep" aria-hidden="true">·</span>
+        <span class="adm-brand__sub">Licencias</span>
+      </span>
+    </a>
+    <div class="adm-user">
+      <div class="adm-user__id">
+        <span class="adm-user__name" id="userName">Cargando…</span>
+        <span class="adm-user__mail truncate" id="userEmail"></span>
+      </div>
+      <button class="btn btn--ghost btn--sm" id="logoutBtn" type="button">Salir</button>
+    </div>
+  </header>
+
+  <main id="main" class="container adm-main">
+    <div class="adm-pagehead">
+      <div class="adm-pagehead__copy">
+        <p class="eyebrow">Operación</p>
+        <h1 class="adm-title">Licencias</h1>
+        <p class="adm-sub">Crea cuentas a mano, confirma transferencias y corta el acceso cuando toque.</p>
+      </div>
+      <button class="btn btn--primary adm-new" id="newAccountBtn" type="button">
+        <span class="adm-plus" aria-hidden="true">+</span>
+        Nueva cuenta
+      </button>
+    </div>
+
+    <section class="adm-kpis" id="kpiGrid" aria-label="Resumen de licencias" aria-busy="true">
+      <article class="adm-kpi">
+        <p class="skel skel--label"></p>
+        <p class="skel skel--num"></p>
+        <p class="skel skel--meta"></p>
+      </article>
+      <article class="adm-kpi">
+        <p class="skel skel--label"></p>
+        <p class="skel skel--num"></p>
+        <p class="skel skel--meta"></p>
+      </article>
+      <article class="adm-kpi">
+        <p class="skel skel--label"></p>
+        <p class="skel skel--num"></p>
+        <p class="skel skel--meta"></p>
+      </article>
+      <article class="adm-kpi">
+        <p class="skel skel--label"></p>
+        <p class="skel skel--num"></p>
+        <p class="skel skel--meta"></p>
+      </article>
+    </section>
+
+    <section class="card adm-accounts" aria-labelledby="accountsTitle">
+      <div class="card__head adm-toolbar">
+        <div class="adm-toolbar__copy">
+          <h2 class="card__title" id="accountsTitle">Cuentas</h2>
+          <p class="card__hint" id="accountsCount" aria-live="polite">Cargando cuentas…</p>
+        </div>
+        <div class="adm-search">
+          <label class="sr-only" for="search">Buscar por empresa, usuario o correo</label>
+          <input class="input adm-search__input" id="search" type="search" name="q"
+                 placeholder="Empresa, usuario o correo" autocomplete="off" spellcheck="false" />
+        </div>
+      </div>
+
+      <div class="adm-tablewrap" id="tableRegion" aria-busy="true">
+        <div class="table-wrap">
+          <table class="table adm-table">
+            <caption class="sr-only">Cuentas con licencia</caption>
+            <thead>
+              <tr>
+                <th scope="col">Empresa</th>
+                <th scope="col">Acceso</th>
+                <th scope="col">Plan</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Vence</th>
+                <th scope="col" class="t-right">Uso</th>
+                <th scope="col" class="t-actions">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="adm-skel-row"><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td></tr>
+              <tr class="adm-skel-row"><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td></tr>
+              <tr class="adm-skel-row"><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td></tr>
+              <tr class="adm-skel-row"><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td></tr>
+              <tr class="adm-skel-row"><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td></tr>
+              <tr class="adm-skel-row"><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td></tr>
+              <tr class="adm-skel-row"><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td><td><span class="skel"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="card adm-audit" aria-labelledby="auditTitle">
+      <div class="card__head">
+        <div class="adm-toolbar__copy">
+          <h2 class="card__title" id="auditTitle">Bitácora</h2>
+          <p class="card__hint">Últimos 80 movimientos de la consola.</p>
+        </div>
+        <button class="btn btn--ghost btn--sm" id="auditRefresh" type="button">Actualizar</button>
+      </div>
+      <div class="adm-audit-list" id="auditList" aria-busy="true">
+        <div class="adm-audit-skel">
+          <span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="adm-foot">
+      <span>Sorteo Studio · UpConta</span>
+      <span id="footStamp">Consola de licencias</span>
+    </footer>
+  </main>
+
+  <!-- ══ Drawer: alta / edición de cuenta ══ -->
+  <div class="backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="drawer" id="accountDrawer" role="dialog" aria-modal="true"
+         aria-labelledby="drawerTitle" aria-describedby="drawerSub" hidden>
+    <div class="drawer__head">
+      <div>
+        <h2 class="card__title" id="drawerTitle">Nueva cuenta</h2>
+        <p class="card__hint" id="drawerSub">Alta manual: cuenta, licencia y marca se crean juntas.</p>
+      </div>
+      <button class="btn btn--ghost btn--icon btn--sm" id="drawerClose" type="button" aria-label="Cerrar">✕</button>
+    </div>
+
+    <form class="drawer__body" id="accountForm" method="post" action="/api/admin/accounts" novalidate>
+      <p class="adm-formsec">Empresa</p>
+      <div class="field">
+        <label for="company">Nombre de la empresa</label>
+        <input class="input" id="company" name="company" type="text" maxlength="80" autocomplete="organization"
+               placeholder="Ej. Grupo Andino Seguros" aria-describedby="err-company" />
+        <p class="err" id="err-company" hidden></p>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="contact">Contacto</label>
+          <input class="input" id="contact" name="contact" type="text" maxlength="80" autocomplete="name"
+                 placeholder="Nombre de quien paga" />
+        </div>
+        <div class="field">
+          <label for="email">Correo</label>
+          <input class="input" id="email" name="email" type="email" maxlength="120" autocomplete="email"
+                 inputmode="email" placeholder="cobranzas@empresa.com" aria-describedby="err-email" />
+          <p class="err" id="err-email" hidden></p>
+        </div>
+      </div>
+
+      <p class="adm-formsec">Acceso</p>
+      <div class="field">
+        <label for="username">Usuario</label>
+        <input class="input mono" id="username" name="username" type="text" maxlength="32" autocomplete="off"
+               spellcheck="false" placeholder="se sugiere desde la empresa" aria-describedby="userHint err-username" />
+        <p class="hint" id="userHint">3–32 caracteres: minúsculas, números, punto, guion o guion bajo.</p>
+        <p class="err" id="err-username" hidden></p>
+      </div>
+      <div class="field" id="passwordField">
+        <label for="password">Contraseña generada</label>
+        <div class="adm-pwd">
+          <input class="input mono" id="password" name="password" type="text" autocomplete="new-password"
+                 spellcheck="false" aria-describedby="pwdHint err-password" />
+          <button class="btn btn--ghost btn--sm" id="pwdRegen" type="button">Regenerar</button>
+          <button class="btn btn--ghost btn--sm" id="pwdCopy" type="button">Copiar</button>
+        </div>
+        <p class="hint" id="pwdHint">14 caracteres sin letras que se confunden. Solo se muestra ahora: se la entregas al cliente y no se vuelve a ver.</p>
+        <p class="err" id="err-password" hidden></p>
+      </div>
+
+      <p class="adm-formsec">Licencia</p>
+      <div class="field-grid">
+        <div class="field">
+          <label for="plan">Plan</label>
+          <select class="select" id="plan" name="plan">
+            <option value="mensual">Mensual</option>
+            <option value="trimestral">Trimestral</option>
+            <option value="anual">Anual</option>
+            <option value="evento">Evento</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="expires">Vence</label>
+          <input class="input" id="expires" name="expires" type="date" aria-describedby="expHint err-expires" />
+          <p class="hint" id="expHint">Vacío = sin vencimiento.</p>
+          <p class="err" id="err-expires" hidden></p>
+        </div>
+      </div>
+      <div class="field">
+        <label for="amount">Monto cobrado (USD)</label>
+        <input class="input num" id="amount" name="amount" type="number" step="0.01" min="0" inputmode="decimal"
+               placeholder="0.00" aria-describedby="amountHint err-amount" />
+        <p class="hint" id="amountHint">Se guarda como ingreso cobrado, para el KPI de ingresos.</p>
+        <p class="err" id="err-amount" hidden></p>
+      </div>
+      <div class="field">
+        <label for="notes">Notas y referencia de pago</label>
+        <textarea class="textarea" id="notes" name="notes" maxlength="400"
+                  placeholder="Ej. Transferencia Pichincha #4451, 14/11. Factura 002-001."></textarea>
+      </div>
+      <div class="field" id="activateField">
+        <label class="adm-check" for="activate">
+          <input type="checkbox" id="activate" name="activate" checked />
+          <span class="adm-check__txt">
+            Activar ahora
+            <small>La licencia nace activa. Si lo dejas sin marcar queda en «pago pendiente» hasta confirmar la transferencia.</small>
+          </span>
+        </label>
+      </div>
+    </form>
+
+    <div class="drawer__foot">
+      <button class="btn btn--ghost" id="drawerCancel" type="button">Cancelar</button>
+      <button class="btn btn--primary" id="drawerSubmit" type="submit" form="accountForm">Crear cuenta</button>
+    </div>
+  </aside>
+
+  <noscript>
+    <div class="container adm-noscript">La consola de licencias necesita JavaScript activado.</div>
+  </noscript>
+
+  <script type="module" src="/js/admin.js"></script>
+</body>
+</html>

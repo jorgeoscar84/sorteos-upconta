@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+data
+legacy
+docs
+scripts
+tests
+qa*.mjs
+*.png
+.taste-skill
+.env
+.env.*
+README.md

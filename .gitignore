@@ -3,19 +3,30 @@ node_modules/
 Thumbs.db
 *.log
 .vercel
+
+# datos locales del servidor (sqlite + uploads)
+data/
+.data/
+
+# secretos
 .env
 .env.*
+!.env.example
 
+# QA / capturas locales
 qa*.mjs
 qa-*.png
 *.png
+!public/**/*.png
 sorteo-qa*
+shots/
+.taste-skill/
 
-qa3.mjs
-qa2.mjs
-qa.mjs
-live-*.png
+# referencia de la v1 (no se despliega)
+legacy/
 
-qa4.mjs
-qa5.mjs
-evento-*.png
+.data*/
+audit/
+*.log.err
+package-lock.json
+

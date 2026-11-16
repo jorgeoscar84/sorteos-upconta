@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sorteo Studio · Acceso</title>
+  <meta name="description" content="Sorteo Studio: sorteos en vivo con la marca de tu empresa para eventos corporativos." />
+  <meta name="color-scheme" content="dark" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B101B'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23E3B04B' stroke-width='2'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='%23E3B04B' stroke-width='1.4'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    rel="stylesheet"
+    data-fonts
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..800&display=swap"
+    media="print" />
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..800&display=swap" />
+  </noscript>
+  <link rel="stylesheet" href="/styles/system.css" />
+  <link rel="stylesheet" href="/styles/login.css" />
+</head>
+<body>
+  <main class="login">
+    <section class="login__left" aria-labelledby="loginHeadline">
+      <header class="login__lockup">
+        <span class="login__mark" aria-hidden="true">S</span>
+        <span class="login__product">Sorteo Studio</span>
+        <span class="login__lockup-sep" aria-hidden="true"></span>
+        <span class="login__lockup-note">Sorteos en vivo</span>
+      </header>
+
+      <div class="login__wheel" aria-hidden="true">
+        <canvas id="loginWheel" width="600" height="600"></canvas>
+        <span class="login__glass"></span>
+        <span class="login__hub">S</span>
+      </div>
+
+      <div class="login__pitch">
+        <p class="eyebrow">White-label para eventos corporativos</p>
+        <h1 class="login__title" id="loginHeadline">
+          El sorteo de tu empresa, con <em>tu marca</em> al frente.
+        </h1>
+        <p class="login__lead">
+          Para quienes organizan eventos y necesitan una ruleta que se vea de la casa, no prestada:
+          sube la lista, fija el premio y proyecta. El logo que se ve en pantalla es el tuyo.
+        </p>
+
+        <ul class="login__values">
+          <li>
+            <span class="login__value-num" aria-hidden="true">01</span>
+            <div>
+              <strong>Tu marca manda</strong>
+              <span>Logo, color y nombre de tu empresa en la ruleta, en el escenario y en la entrega del premio.</span>
+            </div>
+          </li>
+          <li>
+            <span class="login__value-num" aria-hidden="true">02</span>
+            <div>
+              <strong>La lista, en un minuto</strong>
+              <span>Importa Excel o CSV, o pega los nombres. Hasta 2.000 participantes por evento.</span>
+            </div>
+          </li>
+          <li>
+            <span class="login__value-num" aria-hidden="true">03</span>
+            <div>
+              <strong>El acta queda lista</strong>
+              <span>Cada ronda se registra sola y se exporta en CSV para cerrar el evento sin retipear.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="login__right" aria-labelledby="loginTitle">
+      <div class="login__card">
+        <div class="login__card-head">
+          <p class="eyebrow">Acceso privado</p>
+          <h2 class="login__card-title" id="loginTitle">Entra a tu estudio</h2>
+          <p class="login__card-hint">Usa el usuario o correo que te entregaron.</p>
+        </div>
+
+        <form class="login__form" id="loginForm" novalidate>
+          <div class="field">
+            <label for="identifier">Usuario o correo</label>
+            <input
+              class="input login__input"
+              id="identifier"
+              name="identifier"
+              type="text"
+              autocomplete="username"
+              autocapitalize="none"
+              autocorrect="off"
+              spellcheck="false"
+              required
+              aria-describedby="loginError" />
+          </div>
+
+          <div class="field">
+            <label for="password">Contraseña</label>
+            <input
+              class="input login__input"
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              aria-describedby="loginError" />
+          </div>
+
+          <div class="login__error" id="loginError" role="alert" hidden></div>
+
+          <button class="btn btn--primary btn--lg btn--block login__submit" id="btnLogin" type="submit">
+            Entrar
+          </button>
+        </form>
+
+        <div class="login__note">
+          <p>
+            El acceso lo entrega tu administrador. ¿Problemas o olvidaste tu contraseña?
+            <strong>Habla con tu asesor.</strong>
+          </p>
+        </div>
+      </div>
+
+      <p class="login__foot">Sorteo Studio · licencia por empresa · soporte con tu asesor</p>
+    </section>
+  </main>
+
+  <script type="module" src="/js/login.js"></script>
+</body>
+</html>
