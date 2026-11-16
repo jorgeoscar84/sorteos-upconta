@@ -1794,9 +1794,11 @@ function bindUI() {
 
   $('#btnAddPartner')?.addEventListener('click', () => $('#filePartners')?.click());
   $('#filePartners')?.addEventListener('change', (event) => {
-    const files = event.target.files;
+    // Importante: `input.files` es una lista VIVA. Si se limpia el input antes
+    // de copiarla, la lista queda vacía y no se sube nada (fallo silencioso).
+    const files = Array.from(event.target.files || []);
     event.target.value = '';
-    if (files && files.length) handlePartnerFiles(files);
+    if (files.length) handlePartnerFiles(files);
   });
   $('#btnSaveBrand')?.addEventListener('click', saveBranding);
 
