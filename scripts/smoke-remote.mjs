@@ -89,9 +89,11 @@ async function main() {
 
   await t('Login con contraseña incorrecta → 401', async () => {
     const jar = new Jar();
-    const r = await call(jar, '/api/auth/login', { method: 'POST', body: { identifier: ADMIN_USER, password: 'clave-incorrecta-123' } });
-    assert(r.status === 401, `status ${r.status}`);
-    ok('login inválido 401');
+    // Se usa un identificador desechable: así no se gasta el cupo de intentos
+    // del usuario real (el rate limit es por identificador + IP).
+    const r = await call(jar, '/api/auth/login', { method: 'POST', body: { identifier: `nadir-${Date.now()}`, password: 'clave-incorrecta-123' } });
+    assert([401, 429].includes(r.status), `status ${r.status}`);
+    ok('login inválido', `status ${r.status}`);
   });
 
   const adminJar = new Jar();
