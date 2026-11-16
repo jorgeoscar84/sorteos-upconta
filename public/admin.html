@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400..800&display=swap" />
   <link rel="stylesheet" href="/styles/system.css?v=20261116a" />
-  <link rel="stylesheet" href="/styles/admin.css?v=20261116a" />
+  <link rel="stylesheet" href="/styles/admin.css?v=20261116b" />
 </head>
 <body>
   <a class="skip-link" href="#main">Ir al contenido</a>
@@ -128,6 +128,32 @@
       </div>
     </section>
 
+    <section class="card adm-data" aria-labelledby="backupsTitle">
+      <div class="card__head adm-data__head">
+        <div class="adm-toolbar__copy">
+          <h2 class="card__title" id="backupsTitle">Datos y respaldos</h2>
+          <p class="card__hint">
+            El servidor guarda un respaldo automático cada 24 h (conserva los últimos 14). Descarga uno y
+            guárdalo fuera del servidor: es tu copia de seguridad real.
+          </p>
+        </div>
+        <div class="adm-data__actions">
+          <button class="btn btn--primary btn--sm" id="backupCreate" type="button">Crear respaldo ahora</button>
+          <button class="btn btn--ghost btn--sm" id="backupVerify" type="button">Verificar integridad</button>
+        </div>
+      </div>
+
+      <p class="adm-data__meta" id="backupsMeta" aria-live="polite">Cargando respaldos…</p>
+
+      <ul class="adm-backups" id="backupsList" aria-busy="true" aria-label="Respaldos del servidor">
+        <li class="adm-backups__row adm-backups__row--skel" aria-hidden="true"><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span></li>
+        <li class="adm-backups__row adm-backups__row--skel" aria-hidden="true"><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span></li>
+        <li class="adm-backups__row adm-backups__row--skel" aria-hidden="true"><span class="skel"></span><span class="skel"></span><span class="skel"></span><span class="skel"></span></li>
+      </ul>
+
+      <p class="adm-integrity" id="integrityStatus" role="status" hidden></p>
+    </section>
+
     <footer class="adm-foot">
       <span>Sorteo Studio · UpConta</span>
       <span id="footStamp">Consola de licencias</span>
@@ -239,6 +265,6 @@
     <div class="container adm-noscript">La consola de licencias necesita JavaScript activado.</div>
   </noscript>
 
-  <script type="module" src="/js/admin.js?v=20261116a"></script>
+  <script type="module" src="/js/admin.js?v=20261116b"></script>
 </body>
 </html>

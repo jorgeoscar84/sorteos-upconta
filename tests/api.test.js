@@ -679,3 +679,52 @@ test('páginas: /login 200, / sin sesión 302 /login, /admin según rol', {
   const studioPage = await api('GET', '/', { cookie: acmeCookie });
   assert.equal(studioPage.status, 200);
 });
+
+/* ── Datos y respaldos (solo admin) ──────────────────────────────────── */
+
+test('admin: crea, lista y descarga un respaldo válido; integridad OK', async () => {
+  const inicial = await api('GET', '/api/admin/backups', { cookie: adminCookie });
+  assert.equal(inicial.status, 200);
+  assert.ok(Array.isArray(inicial.json.backups));
+  assert.equal(inicial.json.auto.everyHours, 24);
+  assert.equal(inicial.json.auto.keep, 14);
+
+  const created = await api('POST', '/api/admin/backups', { cookie: adminCookie, body: {} });
+  assert.equal(created.status, 201);
+  assert.match(created.json.backup.name, /^app-\d{8}-\d{6}(-\d{2})?\.db$/);
+  assert.ok(created.json.backup.bytes > 0, 'el respaldo no puede salir vacío');
+
+  const download = await api('GET', `/api/admin/backups/${created.json.backup.name}`, { cookie: adminCookie });
+  assert.equal(download.status, 200);
+  assert.match(download.res.headers.get('content-disposition') || '', /attachment/);
+  // El archivo descargado debe ser una base SQLite real, no un error de texto.
+  assert.equal(download.buffer.subarray(0, 15).toString('utf8'), 'SQLite format 3');
+
+  const listed = await api('GET', '/api/admin/backups', { cookie: adminCookie });
+  assert.ok(listed.json.backups.some((item) => item.name === created.json.backup.name));
+  assert.equal(listed.json.backups[0].name, created.json.backup.name, 'el más nuevo va primero');
+
+  const integrity = await api('POST', '/api/admin/maintenance/integrity', { cookie: adminCookie, body: {} });
+  assert.equal(integrity.status, 200);
+  assert.equal(integrity.json.ok, true);
+  assert.equal(integrity.json.integrity, 'ok');
+  assert.ok(integrity.json.counts.accounts >= 2);
+  assert.ok(integrity.json.counts.licenses >= 2);
+});
+
+test('respaldos: rechaza path traversal y a quien no es admin', async () => {
+  const traversal = await api('GET', '/api/admin/backups/..%2F..%2Fapp.db', { cookie: adminCookie });
+  assert.equal(traversal.status, 404);
+
+  const inventado = await api('GET', '/api/admin/backups/no-es-un-respaldo.db', { cookie: adminCookie });
+  assert.equal(inventado.status, 404);
+
+  const listarComoUsuario = await api('GET', '/api/admin/backups', { cookie: acmeCookie });
+  assert.equal(listarComoUsuario.status, 403);
+
+  const crearComoUsuario = await api('POST', '/api/admin/backups', { cookie: acmeCookie, body: {} });
+  assert.equal(crearComoUsuario.status, 403);
+
+  const integridadComoUsuario = await api('POST', '/api/admin/maintenance/integrity', { cookie: acmeCookie, body: {} });
+  assert.equal(integridadComoUsuario.status, 403);
+});

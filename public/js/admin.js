@@ -28,6 +28,11 @@ const dom = {
   auditList: document.getElementById('auditList'),
   auditRefresh: document.getElementById('auditRefresh'),
   footStamp: document.getElementById('footStamp'),
+  backupsList: document.getElementById('backupsList'),
+  backupsMeta: document.getElementById('backupsMeta'),
+  backupCreate: document.getElementById('backupCreate'),
+  backupVerify: document.getElementById('backupVerify'),
+  integrityStatus: document.getElementById('integrityStatus'),
 
   drawer: document.getElementById('accountDrawer'),
   drawerBackdrop: document.getElementById('drawerBackdrop'),
@@ -75,7 +80,11 @@ const state = {
   busy: false,
   menu: null,
   drawerReturn: null,
-  modalReturn: null
+  modalReturn: null,
+  backups: [],
+  backupsReady: false,
+  backupsBusy: false,
+  integrityBusy: false
 };
 
 /* ── Utilidades ── */
@@ -1251,6 +1260,184 @@ async function loadAudit({ silent = false } = {}) {
   }
 }
 
+/* ═══════════════════════════ Datos y respaldos ═══════════════════════════ */
+
+function fmtBytes(bytes) {
+  const n = Number(bytes || 0);
+  if (!Number.isFinite(n) || n <= 0) return '—';
+  if (n < 1024) return `${n} B`;
+  if (n < 1048576) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / 1048576).toFixed(1)} MB`;
+}
+
+/** Error con voz de respaldos (el NOT_FOUND genérico habla de cuentas). */
+function backupError(err) {
+  if (err?.code === 'NOT_FOUND') {
+    return 'Este servidor todavía no expone los respaldos. Intenta de nuevo cuando la actualización esté desplegada.';
+  }
+  return humanError(err);
+}
+
+const backupDownloadUrl = (name) => `/api/admin/backups/${encodeURIComponent(name)}`;
+
+function buildBackupRow(backup) {
+  const name = String(backup?.name || 'respaldo');
+  return el('li', { class: 'adm-backups__row' }, [
+    el('span', { class: 'adm-backups__name', title: name, text: name }),
+    el('span', { class: 'adm-backups__size', text: fmtBytes(backup?.bytes) }),
+    el('span', { class: 'adm-backups__date', text: fmtDateTime(backup?.createdAt) }),
+    el('a', {
+      class: 'btn btn--ghost btn--sm adm-backups__dl',
+      href: backupDownloadUrl(name),
+      text: 'Descargar',
+      'aria-label': `Descargar respaldo ${name}`
+    })
+  ]);
+}
+
+function renderBackups() {
+  const list = state.backups || [];
+  if (!list.length) {
+    dom.backupsList.replaceChildren(el('li', { class: 'adm-backups__empty' }, [
+      el('div', { class: 'empty' }, [
+        el('strong', { text: 'Sin respaldos todavía' }),
+        el('p', { text: 'Crea el primero con «Crear respaldo ahora». El automático aparece acá cada 24 h.' })
+      ])
+    ]));
+    dom.backupsList.setAttribute('aria-busy', 'false');
+    return;
+  }
+  dom.backupsList.replaceChildren(...list.map(buildBackupRow));
+  dom.backupsList.setAttribute('aria-busy', 'false');
+}
+
+function renderBackupsMeta(data) {
+  const last = data?.lastBackupAt;
+  const auto = data?.auto || {};
+  const hours = Number(auto.everyHours || 24);
+  const keep = Number(auto.keep || 14);
+  const parts = [
+    last ? `Último respaldo: ${fmtDateTime(last)}` : 'Todavía sin respaldo automático',
+    `automático cada ${hours} h`,
+    `conserva los últimos ${keep}`
+  ];
+  dom.backupsMeta.textContent = parts.join(' · ');
+}
+
+function renderBackupsError(err) {
+  dom.backupsMeta.textContent = 'No se pudo cargar el estado de los respaldos.';
+  dom.backupsList.replaceChildren(el('li', { class: 'adm-backups__empty' }, [
+    el('div', { class: 'empty' }, [
+      el('strong', { text: 'Los respaldos no cargaron' }),
+      el('p', { text: backupError(err) }),
+      el('button', {
+        class: 'btn btn--ghost btn--sm', type: 'button', text: 'Reintentar',
+        onclick: () => loadBackups()
+      })
+    ])
+  ]));
+  dom.backupsList.setAttribute('aria-busy', 'false');
+}
+
+let backupsSeq = 0;
+async function loadBackups({ silent = false } = {}) {
+  const seq = (backupsSeq += 1);
+  setBusy(dom.backupsList, true);
+  try {
+    const data = await api('/admin/backups');
+    if (seq !== backupsSeq) return;
+    const list = Array.isArray(data?.backups) ? data.backups.slice() : [];
+    // El más nuevo primero, aunque el servidor cambie de criterio.
+    list.sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0));
+    state.backups = list;
+    state.backupsReady = true;
+    renderBackupsMeta(data);
+    renderBackups();
+  } catch (err) {
+    if (seq !== backupsSeq) return;
+    if (!state.backupsReady) renderBackupsError(err);
+    else if (!silent) toast(backupError(err), 'err');
+  } finally {
+    if (seq === backupsSeq) setBusy(dom.backupsList, false);
+  }
+}
+
+async function createBackup() {
+  if (state.backupsBusy) return;
+  state.backupsBusy = true;
+  dom.backupCreate.disabled = true;
+  dom.backupCreate.textContent = 'Creando…';
+  dom.backupCreate.setAttribute('aria-busy', 'true');
+  setBusy(dom.backupsList, true);
+  try {
+    const data = await api('/admin/backups', { method: 'POST', body: {} });
+    const created = data?.backup;
+    toast(created?.name ? `Respaldo creado: ${created.name}.` : 'Respaldo creado.');
+    await loadBackups({ silent: true });
+    const firstDownload = dom.backupsList.querySelector('.adm-backups__dl');
+    if (firstDownload) firstDownload.focus({ preventScroll: true });
+  } catch (err) {
+    toast(backupError(err), 'err');
+  } finally {
+    state.backupsBusy = false;
+    dom.backupCreate.disabled = false;
+    dom.backupCreate.textContent = 'Crear respaldo ahora';
+    dom.backupCreate.removeAttribute('aria-busy');
+    setBusy(dom.backupsList, false);
+  }
+}
+
+function showIntegrity(message, kind = 'ok') {
+  if (!message) {
+    dom.integrityStatus.hidden = true;
+    dom.integrityStatus.textContent = '';
+    dom.integrityStatus.className = 'adm-integrity';
+    dom.integrityStatus.removeAttribute('title');
+    return;
+  }
+  dom.integrityStatus.hidden = false;
+  dom.integrityStatus.className = `adm-integrity adm-integrity--${kind}`;
+  dom.integrityStatus.textContent = message;
+}
+
+async function verifyIntegrity() {
+  if (state.integrityBusy) return;
+  state.integrityBusy = true;
+  dom.backupVerify.disabled = true;
+  dom.backupVerify.textContent = 'Verificando…';
+  dom.backupVerify.setAttribute('aria-busy', 'true');
+  try {
+    const data = await api('/admin/maintenance/integrity', { method: 'POST', body: {} });
+    const counts = data?.counts || {};
+    const accounts = Number(counts.accounts || 0);
+    const licenses = Number(counts.licenses || 0);
+    const participants = Number(counts.participants || 0);
+    const healthy = data?.ok !== false && String(data?.integrity || 'ok').toLowerCase() === 'ok';
+    if (healthy) {
+      showIntegrity(
+        `Integridad OK · ${accounts} ${accounts === 1 ? 'cuenta' : 'cuentas'} · ` +
+        `${licenses} ${licenses === 1 ? 'licencia' : 'licencias'} · ` +
+        `${participants} ${participants === 1 ? 'participante' : 'participantes'}`,
+        'ok'
+      );
+      if (data?.checkedAt) dom.integrityStatus.title = `Verificado ${fmtDateTime(data.checkedAt)}`;
+      toast('Integridad verificada.');
+    } else {
+      showIntegrity(`Integridad con problemas · ${String(data?.integrity || 'revisar')}`, 'err');
+      dom.integrityStatus.title = 'Revisa el respaldo más reciente antes de seguir operando.';
+      toast('La verificación encontró problemas.', 'err');
+    }
+  } catch (err) {
+    showIntegrity(backupError(err), 'err');
+    toast(backupError(err), 'err');
+  } finally {
+    state.integrityBusy = false;
+    dom.backupVerify.disabled = false;
+    dom.backupVerify.textContent = 'Verificar integridad';
+    dom.backupVerify.removeAttribute('aria-busy');
+  }
+}
+
 /* ═══════════════════════════ Sesión ═══════════════════════════ */
 
 async function loadMe() {
@@ -1316,6 +1503,9 @@ function bindEvents() {
     }
   });
 
+  dom.backupCreate.addEventListener('click', createBackup);
+  dom.backupVerify.addEventListener('click', verifyIntegrity);
+
   dom.pwdRegen.addEventListener('click', () => {
     dom.password.value = genPassword();
     setFieldError(dom.password, dom.errPassword, '');
@@ -1366,6 +1556,7 @@ function init() {
   loadOverview();
   loadAccounts('');
   loadAudit();
+  loadBackups();
 }
 
 if (document.readyState === 'loading') {

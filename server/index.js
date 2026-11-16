@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as db from './db.js';
+import * as backups from './backups.js';
 import { hashPassword, loadSession, refreshSessionCookie } from './auth.js';
 import { HttpError, password as validatePassword, username as validateUsername } from './validate.js';
 import { UPLOAD_NAME_RE, mimeForFilename } from './uploads.js';
@@ -335,9 +336,28 @@ async function start() {
   }, 6 * 60 * 60 * 1000);
   sweeper.unref();
 
+  // Respaldo automático de la base: al arrancar (si el último tiene +24 h) y
+  // luego cada hora se vuelve a evaluar. Un fallo aquí nunca tumba el servicio.
+  try {
+    const fresh = backups.runAutoBackupIfDue();
+    if (fresh) console.log(`[backup] respaldo automático creado: ${fresh.name} (${fresh.bytes} bytes)`);
+  } catch (err) {
+    console.error('[backup] no se pudo crear el respaldo inicial:', err.message);
+  }
+  const backupTimer = setInterval(() => {
+    try {
+      const fresh = backups.runAutoBackupIfDue();
+      if (fresh) console.log(`[backup] respaldo automático creado: ${fresh.name} (${fresh.bytes} bytes)`);
+    } catch (err) {
+      console.error('[backup] falló el respaldo automático:', err.message);
+    }
+  }, 60 * 60 * 1000);
+  backupTimer.unref();
+
   const shutdown = (signal) => {
     console.log(`[sorteo] ${signal} recibido, cerrando...`);
     clearInterval(sweeper);
+    clearInterval(backupTimer);
     server.close(() => {
       db.closeDb();
       process.exit(0);

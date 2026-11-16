@@ -123,3 +123,35 @@ contraseña después del primer acceso.
 - Credenciales: se administran en las variables de entorno de Dokploy (`ADMIN_USERNAME` / `ADMIN_PASSWORD`); no viven en el repositorio.
 - El administrador entra en `/admin`; cada empresa entra en `/` con el usuario que se le entregue.
 
+
+## Respaldo y restauración
+
+La base de licencias es el activo del negocio, así que tiene respaldo propio:
+
+- **Automático**: al arrancar y cada hora se evalúa si el último respaldo tiene más de 24 h; si sí, se crea uno con `VACUUM INTO` (snapshot consistente aunque haya escrituras) en `DATA_DIR/backups`. Se conservan los **últimos 14**.
+- **Manual**: en `/admin` → *Datos y respaldos* → **Crear respaldo ahora** y **Descargar**. Guarda ese archivo **fuera del servidor**: un respaldo en el mismo volumen no protege contra la pérdida del volumen.
+- **Integridad**: botón *Verificar integridad* (`PRAGMA integrity_check` + conteos de cuentas, licencias, participantes y sorteos).
+
+### Cómo restaurar (runbook)
+
+1. Descarga el respaldo que quieras restaurar (`app-AAAAMMDD-HHMMSS.db`).
+2. En Dokploy, **detén** la aplicación Sorteo Studio (para que no haya escrituras).
+3. Sube el archivo al volumen y reemplaza la base:
+   ```bash
+   docker run --rm -v sorteo-studio-data:/data -v "$PWD":/in alpine \
+     sh -c "cp /data/app.db /data/app.db.bak-\$(date +%s) && cp /in/app-20260101-120000.db /data/app.db && rm -f /data/app.db-wal /data/app.db-shm"
+   ```
+   (El volumen se llama `sorteo-studio-data`; el `app.db.bak-*` conserva el estado previo.)
+4. **Arranca** la aplicación y verifica: `/healthz` 200, login de admin y *Verificar integridad*.
+5. Revisa que cuentas/licencias aparezcan con su estado correcto antes de avisar a los clientes.
+
+### Cuándo migrar a PostgreSQL
+
+SQLite es suficiente mientras haya **un solo proceso** de aplicación. Migrar cuando ocurra cualquiera de estos disparadores:
+
+- Necesitas **más de una réplica** o balanceo horizontal.
+- Quieres **backups con point-in-time recovery** o réplica de lectura para reportes.
+- Concurrencia sostenida alta (>50 escrituras/segundo) o consultas analíticas pesadas.
+- Varios países/instancias con catálogo creciente (cientos de empresas activas).
+
+La migración consiste en mover `server/db.js` a un pool `pg` (las rutas ya reciben todo a través de esa capa), levantar Postgres como **servicio aparte** en Dokploy, migrar los datos y volver a correr `npm test` + smoke. La capa de datos es el único punto que cambia.

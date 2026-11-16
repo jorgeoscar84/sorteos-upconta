@@ -182,3 +182,12 @@ Códigos: `BAD_REQUEST`, `UNAUTHORIZED`, `FORBIDDEN`, `LICENSE_INACTIVE`, `RATE_
 | `ADMIN_PASSWORD` | bootstrap admin | — |
 | `APP_ORIGIN` | origin público para CSRF | se infiere de `X-Forwarded-*` |
 | `NODE_ENV` | `production` en Docker | — |
+
+### Datos y respaldos (requireAdmin)
+
+- `GET  /api/admin/backups` → `{backups:[{name,bytes,createdAt}], lastBackupAt, auto:{everyHours:24, keep:14}}`
+- `POST /api/admin/backups` → `201 {backup:{name,bytes,createdAt}}` (snapshot con `VACUUM INTO`, audita `BACKUP_CREATED`)
+- `GET  /api/admin/backups/:name` → descarga `.db` (`Content-Disposition: attachment`). Nombre validado por regex `^app-\d{8}-\d{6}(-\d{2})?\.db$`, confinado a `DATA_DIR/backups`.
+- `POST /api/admin/maintenance/integrity` → `{ok, integrity, counts:{accounts,licenses,participants,draws}, checkedAt}` (`PRAGMA integrity_check`, audita `INTEGRITY_CHECKED`)
+
+El respaldo automático corre al arrancar (si el último tiene más de 24 h) y luego cada hora se reevalúa; conserva los últimos 14 en `DATA_DIR/backups`.

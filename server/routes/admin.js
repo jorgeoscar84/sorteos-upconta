@@ -5,6 +5,7 @@
 
 import { Router } from 'express';
 import * as db from '../db.js';
+import * as backups from '../backups.js';
 import { hashPassword, requireAdmin, requireAuth } from '../auth.js';
 import { accountAdminView } from '../serialize.js';
 import {
@@ -306,5 +307,48 @@ router.get('/audit', (req, res) => {
   }
   res.json({ entries: db.listAudit(limit) });
 });
+
+/* ── Datos y respaldos ───────────────────────────────────────────────────
+   El respaldo automático corre en el servidor (cada 24 h, ver backups.js).
+   Aquí el admin puede forzar uno, descargarlo para guardarlo fuera del
+   servidor y comprobar la integridad de la base. */
+
+router.get('/backups', asyncHandler(async (req, res) => {
+  const list = backups.listBackups();
+  res.json({
+    backups: list,
+    lastBackupAt: list[0]?.createdAt || null,
+    auto: { everyHours: backups.AUTO_EVERY_HOURS, keep: backups.KEEP_BACKUPS }
+  });
+}));
+
+router.post('/backups', asyncHandler(async (req, res) => {
+  const backup = backups.createBackup();
+  db.logAudit({
+    actorId: req.account.id,
+    action: 'BACKUP_CREATED',
+    targetId: null,
+    meta: { name: backup.name, bytes: backup.bytes }
+  });
+  res.status(201).json({ backup });
+}));
+
+router.get('/backups/:name', asyncHandler(async (req, res) => {
+  // resolveBackupPath valida el nombre (regex) y confina la ruta a BACKUPS_DIR.
+  const file = backups.resolveBackupPath(req.params.name);
+  res.setHeader('Cache-Control', 'no-store');
+  res.download(file.path, file.name);
+}));
+
+router.post('/maintenance/integrity', asyncHandler(async (req, res) => {
+  const result = backups.integrityCheck();
+  db.logAudit({
+    actorId: req.account.id,
+    action: 'INTEGRITY_CHECKED',
+    targetId: null,
+    meta: { integrity: result.integrity }
+  });
+  res.json(result);
+}));
 
 export default router;
