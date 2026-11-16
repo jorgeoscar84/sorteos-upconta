@@ -95,14 +95,19 @@ function setBusy(value) {
   submitButton.textContent = value ? 'Entrando…' : 'Entrar';
 }
 
+function homeFor(me) {
+  // El administrador aterriza en la consola de licencias; la empresa, en su estudio.
+  return me?.user?.role === 'admin' ? '/admin' : '/';
+}
+
 async function redirectIfSignedIn() {
   // El servidor ya redirige /login cuando hay sesión (pageLogin). Esta
   // comprobación cubre una pestaña con sesión previa sin pedir /auth/me
   // a ciegas: así la consola no acumula un 401 en cada visita anónima.
   if (!hasHint()) return;
   try {
-    await api('/auth/me', { redirectOn401: false });
-    location.replace('/');
+    const me = await api('/auth/me', { redirectOn401: false });
+    location.replace(homeFor(me));
   } catch (error) {
     if (error.status === 401) setHint(false);
   }
@@ -145,13 +150,13 @@ async function onSubmit(event) {
 
   setBusy(true);
   try {
-    await api('/auth/login', {
+    const me = await api('/auth/login', {
       method: 'POST',
       body: { identifier, password },
       redirectOn401: false
     });
     setHint(true);
-    location.replace('/');
+    location.replace(homeFor(me));
   } catch (error) {
     showError(messageFor(error));
     passwordInput.focus();

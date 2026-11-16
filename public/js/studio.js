@@ -377,6 +377,9 @@ function renderUser() {
   const user = state.user || {};
   setText($('#userName'), user.username || 'Usuario');
   setText($('#userAvatar'), initials(user.username || companyName()).slice(0, 2));
+  // El administrador necesita un camino visible a la consola de licencias.
+  const adminLink = $('#btnAdmin');
+  if (adminLink) adminLink.hidden = user.role !== 'admin';
 }
 
 function renderLicense() {
